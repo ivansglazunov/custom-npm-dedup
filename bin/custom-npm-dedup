@@ -4,8 +4,8 @@ const fs = require('fs');
 const { exec } = require('child_process');
 const execP = util.promisify(exec);
 
-const ONLYP = process.env.ONLY || '@deep';
-const IGNOREP = JSON.parse(process.env.IGNORE || `["@deep-foundation/deeplinks"]`);
+const ONLYP = process.env.ONLYP || '@deep';
+const IGNOREP = JSON.parse(process.env.IGNOREP || `["@deep-foundation/deeplinks"]`);
 
 exec('npm list -a -json', {maxBuffer: 1024 * 50000}, (e, stdout) => {
     const list = JSON.parse(stdout);
