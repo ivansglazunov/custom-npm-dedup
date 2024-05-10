@@ -1,0 +1,51 @@
+#!/usr/bin/env node
+const util = require('util');
+const fs = require('fs');
+const { exec } = require('child_process');
+const execP = util.promisify(exec);
+
+const ONLYP = process.env.ONLY || '@deep';
+const IGNOREP = JSON.parse(process.env.IGNORE || `["@deep-foundation/deeplinks"]`);
+
+exec('npm list -a -json', {maxBuffer: 1024 * 50000}, (e, stdout) => {
+    const list = JSON.parse(stdout);
+
+    const versions = {};
+    const describedVersions = {};
+    const step = (parent, name, dep) => {
+        try {
+            if (versions[name]) {
+                if (versions[name].includes(dep.version)) {
+                    versions[name] = versions[name];
+                } else {
+                    versions[name] = [...versions[name], dep.version];
+                    describedVersions[name] = [...describedVersions[name], { parent: parent, version: dep.version }];
+                }
+            } else {
+                versions[name] = [dep.version];
+                describedVersions[name] = [{ parent: parent, version: dep.version }];
+            }
+            if (dep.dependencies) {
+                const deps = Object.keys(dep.dependencies);
+                for (let d = 0; d < deps.length; d++) {
+                    step(name, deps[d], dep.dependencies[deps[d]]);
+                }
+            }
+        } catch(e) {
+            console.log(name, dep);
+            console.error(e);
+        }
+    }
+    step(null, list.name, list);
+    const duplicates = {};
+    const dedup = () => {
+        const vers = Object.keys(describedVersions);
+        for (let v = 0; v < vers.length; v++) {
+            if (describedVersions[vers[v]].length > 1 && describedVersions[vers[v]].find(v => v.parent.includes(ONLYP) && !IGNOREP.includes(v.parent))) {
+                duplicates[vers[v]] = describedVersions[vers[v]].filter(v => v.parent.includes(ONLYP) && !IGNOREP.includes(v.parent));
+            }
+        }
+    }
+    dedup();
+    console.log(JSON.stringify(duplicates, null, 2));
+});

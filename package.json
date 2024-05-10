@@ -1,0 +1,22 @@
+{
+  "name": "custom-npm-dedup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "custom-npm-dedup": "bin/custom-npm-dedup"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ivansglazunov/custom-npm-dedup.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ivansglazunov/custom-npm-dedup/issues"
+  },
+  "homepage": "https://github.com/ivansglazunov/custom-npm-dedup#readme"
+}
